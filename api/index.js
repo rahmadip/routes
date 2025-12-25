@@ -5,9 +5,7 @@ const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 app.use(express.json());
-app.use(
-    cors(origin = 'https://rahmadip.github.io')
-);
+app.use(cors());
 
 const url = process.env.URL;
 const key = process.env.KEY;
