@@ -5,7 +5,39 @@ const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+
+const port = process.env.PORT
+
+const allowedOrigin = 'https://rahmadip.github.io';
+const allowedLocal = `http://localhost:${port}`
+const allowedOrigins = [allowedOrigin, allowedLocal];
+
+app.use(cors({
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    }
+}));
+
+app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    const referer = req.headers.referer;
+
+    const isAllowedOrigin = allowedOrigins.includes(origin);
+    const isAllowedReferer = allowedOrigins.some(auth => referer && referer.startsWith(auth));
+
+    if (isAllowedOrigin || isAllowedReferer) {
+        next();
+    } else {
+        return res.status(403).json({
+            status: 403,
+            error: 'Forbidden access'
+        });
+    }
+});
 
 const url = process.env.URL;
 const key = process.env.KEY;
@@ -18,7 +50,7 @@ app.get('/', (req, res) => {
 app.get('/rahmadip', async (req, res) => {
     try {
         const { data, error, status } = await supabase
-            .from('info')
+            .from('rahmadip')
             .select('*')
             .eq('display', true)
             .order('id', { ascending: true });
@@ -34,7 +66,7 @@ app.get('/rahmadip', async (req, res) => {
 app.get('/tools', async (req, res) => {
     try {
         const { data, error, status } = await supabase
-            .from('svg')
+            .from('tools')
             .select('section, name, path, viewbox')
             .eq('display', true)
             .order('id', { ascending: true });
@@ -51,7 +83,7 @@ app.get('/tools/:tool', async (req, res) => {
     const { tool } = req.params;
     try {
         const { data, error, status } = await supabase
-            .from('svg')
+            .from('tools')
             .select('name, path, viewbox')
             .in('name', tool.split(','));
         if (error) {
