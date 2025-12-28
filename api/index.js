@@ -153,6 +153,7 @@ app.get('/projects/:path/neq', async (req, res) => {
             .select('path, title, type, thumbnail')
             .eq('display', true)
             .neq('path', path)
+            .order('id', { ascending:false })
             .limit(5);
         if (error) {
             throw { error, status };
