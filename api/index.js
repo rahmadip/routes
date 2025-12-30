@@ -9,7 +9,7 @@ app.use(express.json());
 const port = process.env.PORT
 
 const allowedOrigin = 'https://rahmadip.github.io';
-const allowedLocal = `http://localhost:${port}`
+const allowedLocal = `http://192.168.0.100:${port}`
 const allowedOrigins = [allowedOrigin, allowedLocal];
 
 app.use(cors({
